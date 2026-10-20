@@ -1,38 +1,112 @@
-<!doctype html>
+
+<!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="utf-8">
+  <meta charset="UTF-8">
   <meta name="viewport"
-        content="width=device-width, initial-scale=1">
-  <title>Mi primera experiencia AR</title>
+        content="width=device-width, initial-scale=1.0">
+
+  <title>Mi experiencia de Realidad Aumentada</title>
+
   <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
+
   <style>
-    body { margin: 0; overflow: hidden; }
+    body {
+      margin: 0;
+      overflow: hidden;
+      font-family: Arial, sans-serif;
+    }
+
     #aviso {
-      position: fixed; top: 12px; left: 12px; right: 12px;
-      z-index: 10; padding: 10px; border-radius: 8px;
-      background: #153451; color: white;
-      font: 16px Arial; text-align: center;
+      position: fixed;
+      top: 12px;
+      left: 12px;
+      right: 12px;
+      z-index: 9999;
+      padding: 15px;
+      border-radius: 10px;
+      background: #153451;
+      color: white;
+      font-size: 16px;
+      text-align: center;
       pointer-events: none;
     }
   </style>
 </head>
+
 <body>
-  <div id="aviso">Autoriza la cámara y apunta al target</div>
+
+  <div id="aviso">
+    Iniciando realidad aumentada...
+  </div>
+
   <a-scene
-    mindar-image="imageTargetSrc: ./target.mind;"
+    mindar-image="imageTargetSrc: ./target.mind;
+                  autoStart: true;"
     color-space="sRGB"
-    renderer="colorManagement: true;"
+    renderer="colorManagement: true;
+              physicallyCorrectLights: true;"
     vr-mode-ui="enabled: false"
-    device-orientation-permission-ui="enabled: false">
-    <a-camera position="0 0 0"
-              look-controls="enabled: false"></a-camera>
-    <a-entity mindar-image-target="targetIndex: 0">
-      <a-box color="#168BCD"
-             width="0.4" height="0.4" depth="0.4"
-             position="0 0 0.2"></a-box>
+    device-orientation-permission-ui="enabled: false"
+    embedded>
+
+    <a-camera
+      position="0 0 0"
+      look-controls="enabled: false">
+    </a-camera>
+
+    <a-entity
+      id="marcador"
+      mindar-image-target="targetIndex: 0">
+
+      <a-box
+        color="#168BCD"
+        width="0.4"
+        height="0.4"
+        depth="0.4"
+        position="0 0 0.25"
+        material="opacity: 1"
+        animation="property: rotation;
+                   to: 0 360 0;
+                   loop: true;
+                   dur: 3000;
+                   easing: linear">
+      </a-box>
+
     </a-entity>
+
   </a-scene>
+
+  <script>
+    const escena = document.querySelector("a-scene");
+    const marcador = document.querySelector("#marcador");
+    const aviso = document.querySelector("#aviso");
+
+    escena.addEventListener("arReady", () => {
+      aviso.innerHTML =
+        "Camara lista. Apunta hacia target.png";
+      aviso.style.background = "#153451";
+    });
+
+    escena.addEventListener("arError", () => {
+      aviso.innerHTML =
+        "Error al iniciar MindAR. Revisa target.mind";
+      aviso.style.background = "#9B2226";
+    });
+
+    marcador.addEventListener("targetFound", () => {
+      aviso.innerHTML =
+        "Marcador detectado. Cubo activado";
+      aviso.style.background = "#147D40";
+    });
+
+    marcador.addEventListener("targetLost", () => {
+      aviso.innerHTML =
+        "Marcador perdido. Vuelve a apuntar";
+      aviso.style.background = "#B36B00";
+    });
+  </script>
+
 </body>
 </html>
